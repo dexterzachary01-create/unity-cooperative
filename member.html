@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+< lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unity Cooperative - Member Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f6f3;
+      color: #183629;
+    }
+
+    header {
+      background: #123d2a;
+      color: white;
+      padding: 20px;
+    }
+
+    header h2 {
+      margin: 0;
+    }
+
+    header p {
+      margin-bottom: 0;
+      color: #d6eadc;
+    }
+
+    main {
+      padding: 18px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .welcome {
+      margin-bottom: 20px;
+    }
+
+    .notice {
+      background: #fff0c2;
+      padding: 14px;
+      border-radius: 10px;
+      line-height: 1.5;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 13px;
+      box-shadow: 0 3px 12px #0000000c;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 15px;
+      color: #607166;
+    }
+
+    .amount {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+
+    .green {
+      color: #17834a;
+    }
+
+    .red {
+      color: #d43e3e;
+    }
+
+    .progress {
+      height: 10px;
+      background: #e6ece7;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: #17834a;
+    }
+
+    .links {
+      display: grid;
+      gap: 12px;
+    }
+
+    .links a {
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      color: #176b43;
+      text-decoration: none;
+      font-weight: bold;
+      border: 1px solid #e0e9e2;
+    }
+
+    .links a:hover {
+      background: #e8f4eb;
+    }
+
+    footer {
+      text-align: center;
+      color: #718075;
+      padding: 20px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<>
+
+  <header>
+    <h2>UNITY COOPERATIVE</h2>
+    <p>Member Dashboard</p>
+  </header>
+
+  <main>
+
+    <section class="welcome">
+      <h1>Welcome, Member!</h1>
+      <p>Manage and review your cooperative records here.</p>
+    </section>
+
+    <div class="notice">
+      <strong>Preview mode:</strong>
+      This page is not connected to the secure database yet.
+      The amounts below are placeholders, not real financial records.
+    </div>
+
+    <h2>My Financial Summary</h2>
+
+    <section class="grid">
+
+      <div class="card">
+        <h3>My Total Savings</h3>
+        <div class="amount">₦0.00</div>
+        <p>Your recorded contributions will appear here.</p>
+      </div>
+
+      <div class="card">
+        <h3>My Outstanding Loan</h3>
+        <div class="amount">₦0.00</div>
+        <p>Your unpaid loan balance will appear here.</p>
+      </div>
+
+      <div class="card">
+        <h3>My Loan Repayments</h3>
+        <div class="amount">₦0.00</div>
+        <p>Your confirmed repayments will appear here.</p>
+      </div>
+
+    </section>
+
+    <h2>My Savings Target</h2>
+
+    <section class="card">
+      <p class="green"><strong>Target achieved: Not available yet</strong></p>
+      <div class="progress"><span></span></div>
+      <p class="red">Target remaining: Not available yet</p>
+      <p>Your progress will appear after your target is set.</p>
+    </section>
+
+    <h2>My Loan Repayment Progress</h2>
+
+    <section class="card">
+      <p class="green"><strong>Amount paid: Not available yet</strong></p>
+      <div class="progress"><span></span></div>
+      <p class="red">Amount remaining: Not available yet</p>
+      <p>Your progress will appear when you have an active loan.</p>
+    </section>
+
+    <h2>Member Services</h2>
+
+    <nav class="links">
+      <a href="login.html">← Return to Login</a>
+      <a href="index.html">Return to Homepage</a>
+    </nav>
+
+  </main>
+
+  <footer>
+    Unity Cooperative · Private Member Portal
+  </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <script>
+    (async function () {
+      const money = amount =>
+        new Intl.NumberFormat("en-NG", {
+          style: "currency",
+          currency: "NGN"
+        }).format(Number(amount) || 0);
+
+      const cards = document.querySelectorAll(".grid .card");
+      const progressCards = document.querySelectorAll("main section.card");
+const savingsTargetCard = progressCards[0];
+const loanProgressCard = progressCards[1];
+      const notice = document.querySelector(".notice");
+
+      function setProgress(card, paid, total, label) {
+        if (!card) return;
+
+        const safeTotal = Math.max(0, Number(total) || 0);
+        const safePaid = Math.min(
+          safeTotal,
+          Math.max(0, Number(paid) || 0)
+        );
+        const remaining = Math.max(0, safeTotal - safePaid);
+        const percentage = safeTotal > 0
+          ? Math.round((safePaid / safeTotal) * 100)
+          : 0;
+
+        const greenText = card.querySelector(".green strong");
+        const redText = card.querySelector(".red");
+        const bar = card.querySelector(".progress span");
+
+        if (greenText) {
+          greenText.textContent =
+            label + ": " + money(safePaid) + " (" + percentage + "%)";
+        }
+
+        if (redText) {
+          redText.textContent =
+            "Remaining: " + money(remaining) +
+            " (" + (100 - percentage) + "%)";
+        }
+
+        if (bar) {
+          bar.style.width = percentage + "%";
+        }
+      }
+
+      function showUnavailable(text) {
+        if (notice) {
+          notice.textContent = text;
+          notice.style.display = "block";
+        }
+      }
+
+      try {
+        const client = window.unitySupabase;
+
+        if (!client) {
+          throw new Error(
+            "Supabase did not load. Check supabase.js and refresh the page."
+          );
+        }
+
+        const {
+          data: { user },
+          error: authError
+        } = await client.auth.getUser();
+
+        if (authError) throw authError;
+
+        if (!user) {
+          showUnavailable(
+            "Please log in to view your private cooperative records."
+          );
+          return;
+        }
+
+        const { data: member, error: memberError } = await client
+          .from("members")
+        .select("id, savings_target, status")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (memberError) throw memberError;
+
+        if (!member) {
+          showUnavailable(
+            "Your account is registered, but your membership record " +
+            "has not been created yet. Please contact the cooperative administrator."
+          );
+          return;
+        }
+
+        if (member.status !== "active") {
+          showUnavailable(
+            "Your membership is awaiting activation by the cooperative administrator."
+          );
+          return;
+        }
+
+        if (notice) notice.style.display = "none";
+
+        const welcome = document.querySelector(".welcome h1");
+        if (welcome && member.full_name) {
+          welcome.textContent = "Welcome, " + member.full_name + "!";
+        }
+
+        const [
+          savingsResult,
+          loansResult
+        ] = await Promise.all([
+          client
+            .from("savings")
+            .select("amount")
+            .eq("member_id", member.id),
+
+          client
+            .from("loans")
+            .select("id, total_repayment, amount_paid, status")
+            .eq("member_id", member.id)
+        ]);
+
+        if (savingsResult.error) throw savingsResult.error;
+        if (loansResult.error) throw loansResult.error;
+
+        const savings = savingsResult.data || [];
+        const loans = loansResult.data || [];
+
+        const totalSavings = savings.reduce(
+          (sum, row) => sum + Number(row.amount || 0),
+          0
+        );
+
+        const outstandingLoan = loans.reduce((sum, loan) => {
+          if (loan.status === "rejected" || loan.status === "cancelled") {
+            return sum;
+          }
+
+          return sum + Math.max(
+            0,
+            Number(loan.total_repayment || 0) -
+            Number(loan.amount_paid || 0)
+          );
+        }, 0);
+
+        const totalRepayments = loans.reduce(
+          (sum, loan) => sum + Number(loan.amount_paid || 0),
+          0
+        );
+
+        if (cards.length >= 3) {
+          cards[0].querySelector(".amount").textContent = money(totalSavings);
+          cards[1].querySelector(".amount").textContent = money(outstandingLoan);
+          cards[2].querySelector(".amount").textContent = money(totalRepayments);
+        }
+
+        const target = Number(member.savings_target || 0);
+
+        if (target > 0) {
+          setProgress(savingsTargetCard, totalSavings, target, "Saved");
+        } else if (savingsTargetCard) {
+          const green = savingsTargetCard.querySelector(".green strong");
+          const red = savingsTargetCard.querySelector(".red");
+
+          if (green) green.textContent = "Savings target: Not set";
+          if (red) red.textContent = "Target remaining: Not available";
+        }
+
+        const repaymentTotal = loans.reduce(
+          (sum, loan) => sum + Number(loan.total_repayment || 0),
+          0
+        );
+
+        if (repaymentTotal > 0) {
+          setProgress(loanProgressCard, totalRepayments, repaymentTotal, "Amount paid");
+        } else if (loanProgressCard) {
+          const green = loanProgressCard.querySelector(".green strong");
+          const red = loanProgressCard.querySelector(".red");
+
+          if (green) green.textContent = "Amount paid: No loan records";
+          if (red) red.textContent = "Amount remaining: Not available";
+        }
+
+        console.log("Unity Cooperative dashboard loaded.");
+
+      } catch (error) {
+        console.error("Dashboard error:", error);
+
+        showUnavailable(
+          "We could not load your financial records. Please refresh " +
+          "the page or contact the administrator if the problem continues."
+        );
+      }
+    })();
+  </script>
+
+</body>
+</html>

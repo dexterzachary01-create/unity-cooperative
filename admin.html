@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity Cooperative | Admin Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6f4;
+      color: #24352c;
+    }
+
+    header {
+      background: #075b35;
+      color: white;
+      padding: 20px 16px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .top-label {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #ffffff20;
+      font-size: 12px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px 14px 35px;
+    }
+
+    .notice {
+      background: #fff8df;
+      border: 1px solid #f0d477;
+      border-radius: 10px;
+      padding: 13px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin: 22px 0 12px;
+      color: #075b35;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 3px 12px #00000008;
+      border: 1px solid #e7ede9;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #68766d;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 23px;
+      font-weight: bold;
+      color: #075b35;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-note {
+      font-size: 11px;
+      color: #7a877e;
+      margin-top: 7px;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      background: white;
+      color: #244333;
+      border: 1px solid #e1e9e3;
+      border-radius: 12px;
+      padding: 17px 12px;
+      min-height: 105px;
+      box-shadow: 0 3px 12px #00000005;
+    }
+
+    .menu .icon {
+      font-size: 25px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .menu strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .menu small {
+      display: block;
+      color: #718077;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e9e3;
+      padding: 17px;
+      margin-top: 14px;
+    }
+
+    .panel h3 {
+      color: #075b35;
+      font-size: 16px;
+      margin-bottom: 9px;
+    }
+
+    .panel p {
+      font-size: 13px;
+      color: #69776e;
+      line-height: 1.7;
+    }
+
+    .progress {
+      width: 100%;
+      height: 9px;
+      background: #f5d6d6;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #198754;
+    }
+
+    .progress-caption {
+      font-size: 11px;
+      color: #77847b;
+      margin-top: 7px;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .button {
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #075b35;
+      color: white;
+    }
+
+    .secondary {
+      background: #e7f2ea;
+      color: #075b35;
+    }
+
+    footer {
+      text-align: center;
+      color: #7b887f;
+      font-size: 11px;
+      padding: 20px 12px;
+      line-height: 1.7;
+    }
+
+    @media (min-width: 700px) {
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .menu {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      header {
+        padding: 25px calc((100% - 1050px) / 2);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>UNITY COOPERATIVE</h1>
+    <p>Administration & Record Management</p>
+    <span class="top-label">ADMIN DASHBOARD · PREVIEW</span>
+  </header>
+
+  <main class="container">
+
+    <div class="notice">
+      <strong>Preview mode:</strong> This dashboard is currently a design prototype.
+      Member records, savings, loans, and reports are not yet connected to a secure
+      database. Do not enter real financial or personal information here yet.
+    </div>
+
+    <h2 class="section-title">Cooperative Overview</h2>
+
+    <section class="stats">
+      <div class="card">
+        <div class="stat-label">Total Members</div>
+        <div class="stat-value">0</div>
+        <div class="stat-note">Registered members</div>
+      </div>
+
+      <div class="card">
+        <div class="stat-label">Total Savings</div>
+        <div class="stat-value">₦0.00</div>
+        <div class="stat-note">Recorded contributions</div>
+      </div>
+
+      <div class="card">
+        <div class="stat-label">Active Loans</div>
+        <div class="stat-value">0</div>
+        <div class="stat-note">Loans being repaid</div>
+      </div>
+
+      <div class="card">
+        <div class="stat-label">Loan Balance</div>
+        <div class="stat-value">₦0.00</div>
+        <div class="stat-note">Outstanding repayments</div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Administration Menu</h2>
+
+    <section class="menu">
+
+      <a href="#" onclick="showMessage('Member Management'); return false;">
+        <span class="icon">👥</span>
+        <strong>Manage Members</strong>
+        <small>Add members, assign four-digit IDs, edit profiles, and manage accounts.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Savings Management'); return false;">
+        <span class="icon">💰</span>
+        <strong>Manage Savings</strong>
+        <small>Record weekly, monthly, and additional savings contributions.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Loans Management'); return false;">
+        <span class="icon">🏦</span>
+        <strong>Manage Loans</strong>
+        <small>Record loans, agreed repayment amounts, and repayment transactions.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Receipts and Documents'); return false;">
+        <span class="icon">📄</span>
+        <strong>Receipts & Documents</strong>
+        <small>Manage payment receipts, agreements, signatures, and loan documents.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Reports'); return false;">
+        <span class="icon">📊</span>
+        <strong>Reports & Records</strong>
+        <small>Search records by member, ID, date, month, or year.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Print and Export'); return false;">
+        <span class="icon">🖨️</span>
+        <strong>Print & Export</strong>
+        <small>Prepare printable records and export reports to CSV.</small>
+      </a>
+
+      <a href="chat.html">
+        <span class="icon">💬</span>
+        <strong>Member Group Chat</strong>
+        <small>Planned cooperative chat with timestamps and admin moderation.</small>
+      </a>
+
+      <a href="#" onclick="showMessage('Activity Log'); return false;">
+        <span class="icon">🔐</span>
+        <strong>Activity & Audit Log</strong>
+        <small>Track important actions and corrections to financial records.</small>
+      </a>
+
+      <a href="index.html">
+        <span class="icon">🏠</span>
+        <strong>View Homepage</strong>
+        <small>Return to the Unity Cooperative homepage.</small>
+      </a>
+
+    </section>
+
+    <h2 class="section-title">Financial Progress Preview</h2>
+
+    <div class="panel">
+      <h3>Group Savings Target</h3>
+      <p>
+        Once the cooperative target and actual savings are configured, this section
+        will show the percentage achieved in green and the remaining percentage in red.
+      </p>
+      <div class="progress">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-caption">No target or savings data connected yet.</div>
+    </div>
+
+    <div class="panel">
+      <h3>Loan Repayment Progress</h3>
+      <p>
+        Once loan records are connected, this section will calculate amounts paid
+        and outstanding using each loan's agreed total repayment amount.
+      </p>
+      <div class="progress">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-caption">No loan repayment data connected yet.</div>
+    </div>
+
+    <div class="quick-links">
+      <a class="button primary" href="login.html">Go to Login</a>
+      <a class="button secondary" href="member.html">Preview Member Dashboard</a>
+      <a class="button secondary" href="index.html">Homepage</a>
+    </div>
+
+  </main>
+
+  <footer>
+    Unity Cooperative Record Management System<br>
+    Secure database and administrator authentication will be configured later.
+  </footer>
+
+  <script>
+    function showMessage(section) {
+      alert(
+        section +
+        " is part of the planned Unity Cooperative system. " +
+        "It will work after the secure database and administrator access are connected."
+      );
+    }
+  </script>
+
+</body>
+</html>

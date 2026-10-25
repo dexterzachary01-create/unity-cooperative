@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123d2a">
+  <title>Login | Unity Cooperative</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f7f4;
+      color: #183629;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 30px 24px;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo {
+      width: 65px;
+      height: 65px;
+      background: #176b43;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 25px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #68766e;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 16px 0 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d4dfd7;
+      border-radius: 9px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #b5dfc5;
+      border-color: #176b43;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #176b43;
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 22px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #message {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 14px;
+    }
+
+    .back-link a {
+      color: #176b43;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .security-note {
+      text-align: center;
+      color: #68766e;
+      font-size: 12px;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-card">
+    <div class="logo">UC</div>
+
+    <h1>Unity Cooperative</h1>
+    <p class="subtitle">
+      Sign in to access your cooperative account.
+    </p>
+
+    <form id="loginForm">
+      <label for="email">Email address</label>
+      <input
+        type="email"
+        id="email"
+        autocomplete="username"
+        placeholder="Enter your email"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        autocomplete="current-password"
+        placeholder="Enter your password"
+        required
+      >
+
+      <button type="submit" id="loginButton">
+        Sign In
+      </button>
+
+      <div id="message" role="status" aria-live="polite"></div>
+    </form>
+
+    <p class="back-link">
+      <a href="index.html">← Back to Homepage</a>
+    </p>
+
+    <p class="security-note">
+      Your financial records should only be accessible to
+      authorized users. Never share your password.
+    </p>
+  </main>
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const messageBox = document.getElementById("message");
+
+    loginForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  messageBox.style.display = "block";
+  messageBox.style.background = "#e0f2fe";
+  messageBox.style.color = "#075985";
+  messageBox.textContent = "Signing in...";
+
+  try {
+    const { data, error } = await window.unitySupabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    messageBox.style.background = "#dcfce7";
+    messageBox.style.color = "#166534";
+    messageBox.textContent = "Login successful! Opening your dashboard...";
+
+    const { data: profile, error: profileError } = await window.unitySupabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      throw profileError;
+    }
+
+    if (profile && profile.role === "admin") {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "member.html";
+    }
+  } catch (error) {
+    messageBox.style.background = "#fee2e2";
+    messageBox.style.color = "#991b1b";
+    messageBox.textContent = error.message || "Login failed. Please try again.";
+  }
+});
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+</body>
+</html>
