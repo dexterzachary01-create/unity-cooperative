@@ -1,0 +1,448 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity Cooperative | Member Management</title>  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6f4;
+      color: #24352c;
+    }
+
+    header {
+      background: #075b35;
+      color: white;
+      padding: 20px 16px;
+    }
+
+    header h1 { font-size: 22px; margin-bottom: 7px; }
+    header p { font-size: 13px; }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px 14px 35px;
+    }
+
+    .notice {
+      background: #fff8df;
+      border: 1px solid #f0d477;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: white;
+      padding: 17px;
+      border: 1px solid #e1e9e3;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      color: #075b35;
+      font-size: 19px;
+      margin-bottom: 14px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid #e1e9e3;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .summary-card small {
+      display: block;
+      color: #68766d;
+      margin-bottom: 8px;
+    }
+
+    .summary-card strong {
+      color: #075b35;
+      font-size: 25px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      min-height: 45px;
+      padding: 11px;
+      border: 1px solid #cfdad2;
+      border-radius: 8px;
+      background: white;
+      font-size: 16px;
+      margin-bottom: 13px;
+    }
+
+    .button {
+      display: inline-block;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .primary { background: #075b35; color: white; }
+    .secondary { background: #e7f2ea; color: #075b35; }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 5px;
+    }
+
+    #status {
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 10px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e8eee9;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf5ef;
+      color: #075b35;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 15px;
+      background: #fff1cc;
+      color: #805900;
+      font-size: 11px;
+    }
+
+    .badge.active {
+      background: #d9f4e2;
+      color: #176737;
+    }
+
+    .badge.inactive {
+      background: #fbe0e0;
+      color: #8c2525;
+    }
+
+    .muted { color: #758078; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .small-button {
+      border: 1px solid #cfdad2;
+      border-radius: 6px;
+      padding: 7px 9px;
+      background: white;
+      color: #075b35;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .small-button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    @media (min-width: 650px) {
+      .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .search-row { grid-template-columns: 1fr 190px; }
+    }
+  </style></head><body>
+<header>
+  <h1>UNITY COOPERATIVE</h1>
+  <p>Administrator · Member Management</p>
+</header><main>
+  <div class="notice">
+    <strong>Administrator page:</strong>
+    Use this page to review registered member records. Member information is
+    retrieved from Supabase. Account activation controls will work only when
+    the database permissions have been configured.
+  </div>  <div id="status" role="status" aria-live="polite">Checking administrator access…</div>  <section class="summary">
+    <div class="summary-card">
+      <small>Total member records</small>
+      <strong id="total-members">—</strong>
+    </div><div class="summary-card">
+  <small>Active memberships</small>
+  <strong id="active-members">—</strong>
+</div>
+
+<div class="summary-card">
+  <small>Pending memberships</small>
+  <strong id="pending-members">—</strong>
+</div>
+
+  </section>  <section class="panel">
+    <h2>Search Members</h2><div class="search-row">
+  <input
+    id="search"
+    type="search"
+    placeholder="Search by name, membership number, or phone"
+    aria-label="Search members"
+  >
+
+  <select id="status-filter" aria-label="Filter by membership status">
+    <option value="all">All statuses</option>
+    <option value="active">Active</option>
+    <option value="pending">Pending</option>
+    <option value="inactive">Inactive</option>
+  </select>
+</div>
+
+<button class="button primary" id="refresh-button" type="button">
+  Refresh Records
+</button>
+
+  </section>  <section class="panel">
+    <h2>Registered Members</h2><div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Member ID</th>
+        <th>Full Name</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="members-table">
+      <tr>
+        <td colspan="6" class="muted">Waiting for database records…</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  </section>  <p style="margin-bottom:14px">
+    <a class="button secondary" href="admin.html">Back to Admin Dashboard</a>
+  </p>
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.js"></script><script>
+const client = window.unitySupabase;
+let allMembers = [];
+let profileNames = {};
+
+const statusElement = document.getElementById("status");
+const tableBody = document.getElementById("members-table");
+
+function safeText(value) {
+  return String(value ?? "");
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("en-GB");
+}
+
+function addCell(row, value) {
+  const cell = document.createElement("td");
+  cell.textContent = safeText(value);
+  row.appendChild(cell);
+  return cell;
+}
+
+function renderMembers() {
+  const search = document.getElementById("search").value.trim().toLowerCase();
+  const filter = document.getElementById("status-filter").value;
+
+  const filtered = allMembers.filter(member => {
+    const name = profileNames[member.user_id] || "";
+    const haystack = [
+      name,
+      member.member_number,
+      member.phone
+    ].map(value => safeText(value).toLowerCase()).join(" ");
+
+    const matchesSearch = haystack.includes(search);
+    const matchesStatus =
+      filter === "all" || member.status === filter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  tableBody.replaceChildren();
+
+  if (!filtered.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.className = "muted";
+    cell.textContent = allMembers.length
+      ? "No members match your search."
+      : "No member records were found.";
+    row.appendChild(cell);
+    tableBody.appendChild(row);
+    return;
+  }
+
+  filtered.forEach(member => {
+    const row = document.createElement("tr");
+
+    addCell(row, member.member_number || "—");
+    addCell(row, profileNames[member.user_id] || "Name not available");
+    addCell(row, member.phone || "—");
+
+    const statusCell = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "badge " + safeText(member.status);
+    badge.textContent = member.status || "unknown";
+    statusCell.appendChild(badge);
+    row.appendChild(statusCell);
+
+    addCell(row, formatDate(member.created_at));
+
+    const actionCell = document.createElement("td");
+    const actionText = document.createElement("span");
+    actionText.className = "muted";
+    actionText.textContent = "Read-only";
+    actionCell.appendChild(actionText);
+    row.appendChild(actionCell);
+
+    tableBody.appendChild(row);
+  });
+}
+
+async function loadMembers() {
+  statusElement.textContent = "Loading member records…";
+  tableBody.replaceChildren();
+
+  const { data: members, error: membersError } = await client
+    .from("members")
+    .select("id, user_id, member_number, phone, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (membersError) {
+    console.error("Could not load members:", membersError);
+    statusElement.textContent =
+      "Could not load members. Check your Supabase administrator SELECT policy.";
+    return;
+  }
+
+  allMembers = members || [];
+
+  const userIds = [...new Set(
+    allMembers.map(member => member.user_id).filter(Boolean)
+  )];
+
+  profileNames = {};
+
+  if (userIds.length) {
+    const { data: profiles, error: profilesError } = await client
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error("Could not load profile names:", profilesError);
+    } else {
+      (profiles || []).forEach(profile => {
+        profileNames[profile.id] = profile.full_name || "";
+      });
+    }
+  }
+
+  document.getElementById("total-members").textContent = allMembers.length;
+
+  document.getElementById("active-members").textContent =
+    allMembers.filter(member => member.status === "active").length;
+
+  document.getElementById("pending-members").textContent =
+    allMembers.filter(member => member.status === "pending").length;
+
+  renderMembers();
+  statusElement.textContent = "Member records loaded.";
+}
+
+async function checkAdminAccess() {
+  if (!client) {
+    statusElement.textContent =
+      "Supabase failed to initialise. Check supabase.js.";
+    return false;
+  }
+
+  const { data: authData, error: authError } = await client.auth.getUser();
+
+  if (authError || !authData.user) {
+    window.location.href = "login.html";
+    return false;
+  }
+
+  const { data: profile, error: profileError } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", authData.user.id)
+    .maybeSingle();
+
+  if (profileError || !profile || profile.role !== "admin") {
+    statusElement.textContent = "Administrator access is required.";
+    await client.auth.signOut();
+    window.location.href = "login.html";
+    return false;
+  }
+
+  return true;
+}
+
+document.getElementById("search").addEventListener("input", renderMembers);
+document.getElementById("status-filter").addEventListener("change", renderMembers);
+
+document.getElementById("refresh-button").addEventListener("click", async () => {
+  await loadMembers();
+});
+
+(async function init() {
+  if (await checkAdminAccess()) {
+    await loadMembers();
+  }
+})();
+</script></body>
+</html>
