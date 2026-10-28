@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan Management | Unity Cooperative</title>
+
+<style>
+:root {
+  --green: #147d45;
+  --green-light: #e4f5eb;
+  --red: #d73737;
+  --red-light: #fdeaea;
+  --navy: #17352a;
+  --background: #f4f7f5;
+  --border: #dce5df;
+  --muted: #68766d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: #203129;
+}
+
+header {
+  background: var(--navy);
+  color: white;
+  padding: 20px;
+}
+
+.header-inner, main {
+  max-width: 1150px;
+  margin: auto;
+}
+
+header h1 { margin: 0 0 6px; font-size: 24px; }
+header p { margin: 0; color: #d5e8dc; }
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  border: 1px solid #648273;
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+main { padding: 20px 14px 45px; }
+
+.notice {
+  padding: 13px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.message {
+  display: none;
+  padding: 13px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.message.success {
+  display: block;
+  background: var(--green-light);
+  color: #145b35;
+}
+
+.message.error {
+  display: block;
+  background: var(--red-light);
+  color: #922222;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat, .panel {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 17px;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.stat strong {
+  font-size: 21px;
+  overflow-wrap: anywhere;
+}
+
+.panel { margin-bottom: 19px; }
+.panel h2 { font-size: 19px; margin: 0 0 16px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.field { min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+input, select, textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #cbd8cf;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 15px;
+  background: white;
+  color: #203129;
+}
+
+textarea { resize: vertical; min-height: 85px; }
+
+.help {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+button {
+  padding: 12px 15px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.primary { background: var(--green); color: white; }
+.secondary { background: #e8efea; color: #203129; }
+.danger { background: var(--red-light); color: #922222; }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search-row input { flex: 1; }
+
+.loan-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 13px 0;
+  background: #fff;
+}
+
+.loan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.loan-top h3 { margin: 0 0 6px; font-size: 17px; }
+.loan-top p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+
+.badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #edf0ee;
+}
+
+.badge.paid { background: var(--green-light); color: #145b35; }
+.badge.overdue { background: var(--red-light); color: #922222; }
+
+.loan-numbers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 17px 0;
+}
+
+.loan-numbers div {
+  background: #f6f8f6;
+  padding: 11px;
+  border-radius: 8px;
+}
+
+.loan-numbers span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.loan-numbers strong { overflow-wrap: anywhere; }
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  margin: 13px 0 6px;
+}
+
+.progress {
+  height: 11px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f4dcdc;
+}
+
+.progress > div {
+  height: 100%;
+  width: 0;
+  transition: width .2s;
+}
+
+.progress-paid > div {
+  background: var(--green);
+}
+
+.progress-remaining > div {
+  background: var(--red);
+}
+
+.document-links, .repayments {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.document-links a {
+  display: inline-block;
+  margin: 5px 10px 5px 0;
+  color: var(--green);
+  overflow-wrap: anywhere;
+}
+
+.repayments summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.repayment-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0ee;
+  font-size: 13px;
+}
+
+.empty {
+  text-align: center;
+  padding: 25px 10px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.small { font-size: 12px; color: var(--muted); }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: auto; }
+  .search-row { flex-direction: column; }
+  header h1 { font-size: 21px; }
+  .loan-numbers { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Unity Cooperative</h1>
+    <p>Loan Management &amp; Repayment Records</p>
+
+    <nav>
+      <a href="admin.html">Admin Dashboard</a>
+      <a href="members.html">Members</a>
+      <a href="savings.html">Savings</a>
+      <a href="chat.html">Group Chat</a>
+      <a href="member.html">Member Area</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div id="message" class="message" role="status" aria-live="polite"></div>
+
+  <div class="notice">
+    <strong>Administrator access only.</strong>
+    Register each loan separately and record every repayment against
+    the correct loan. Loan documents are stored in your private
+    cooperative storage bucket.
+  </div>
+
+  <section class="stats">
+    <div class="stat">
+      <span>Loans Recorded</span>
+      <strong id="stat-count">0</strong>
+    </div>
+
+    <div class="stat">
+      <span>Total Original Loan Amounts</span>
+      <strong id="stat-principal">₦0.00</strong>
+    </div>
+
+    <div class="stat">
+      <span>Total Repaid</span>
+      <strong id="stat-paid">₦0.00</strong>
+    </div>
+
+    <div class="stat">
+      <span>Total Outstanding</span>
+      <strong id="stat-outstanding">₦0.00</strong>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Register a New Loan</h2>
+
+    <form id="loan-form">
+      <div class="form-grid">
+
+        <div class="field full">
+          <label for="member">Borrower *</label>
+
+          <select id="member" required>
+            <option value="">Loading members…</option>
+          </select>
+
+          <div class="help">
+            Select the existing cooperative member who is borrowing.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="principal">Original Loan Amount (₦) *</label>
+
+          <input id="principal" type="number" min="0.01"
+                 step="0.01" required placeholder="100000">
+        </div>
+
+        <div class="field">
+          <label for="total-repayment">Agreed Total Repayment (₦) *</label>
+
+          <input id="total-repayment" type="number" min="0.01"
+                 step="0.01" required placeholder="110000">
+
+          <div class="help">
+            Enter the full amount the borrower agreed to repay.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="loan-date">Loan Date *</label>
+          <input id="loan-date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="due-date">Repayment Due Date *</label>
+          <input id="due-date" type="date" required>
+        </div>
+
+        <div class="field full">
+          <label for="photo">Borrower's Photograph *</label>
+
+          <input id="photo" type="file"
+                 accept="image/jpeg,image/png"
+                 capture="user" required>
+
+          <div class="help">
+            On a supported phone, this may open the camera.
+            Take the photograph when the loan is issued.
+            The website records the upload time; it cannot prove
+            that an uploaded photograph was captured on the loan date.
+            Maximum file size: 5 MB.
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="form1">Loan Form 1 — Required *</label>
+
+          <input id="form1" type="file"
+                 accept="image/jpeg,image/png,application/pdf" required>
+        </div>
+
+        <div class="field">
+          <label for="form2">Loan Form 2 — Optional</label>
+
+          <input id="form2" type="file"
+                 accept="image/jpeg,image/png,application/pdf">
+        </div>
+
+        <div class="field">
+          <label for="form3">Loan Form 3 — Optional</label>
+
+          <input id="form3" type="file"
+                 accept="image/jpeg,image/png,application/pdf">
+        </div>
+
+        <div class="field full">
+          <label for="loan-notes">Loan Agreement / Notes</label>
+
+          <textarea id="loan-notes"
+                    placeholder="Enter agreed terms, guarantor details or other notes"></textarea>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="save-loan" type="submit">
+          Save Loan Record
+        </button>
+
+        <button class="secondary" type="reset">
+          Clear Form
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Loan Records</h2>
+
+    <div class="search-row">
+      <input id="search" type="search"
+             placeholder="Search borrower, membership number or loan ID">
+
+      <button class="secondary" id="refresh" type="button">
+        Refresh Records
+      </button>
+    </div>
+
+    <p class="small">
+      Outstanding balances are calculated from the agreed total
+      repayment minus recorded repayments. Each repayment is saved
+      as a separate record.
+    </p>
+
+    <div id="loan-list">
+      <div class="empty">Loading loan records…</div>
+    </div>
+  </section>
+
+</main>
+
+<script src="supabase.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  const BUCKET = "unity-cooperative-documents";
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+  const $ = id => document.getElementById(id);
+
+  let db;
+  let currentUser;
+  let members = [];
+  let loans = [];
+  let repayments = [];
+  let profileNames = {};
+  let busy = false;
+
+  const naira = amount => new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number(amount) || 0);
+
+  const today = () => {
+    const d = new Date();
+
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0")
+    ].join("-");
+  };
+
+  function showMessage(text, type) {
+    const el = $("message");
+
+    el.textContent = text;
+    el.className = "message " + type;
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function clearMessage() {
+    $("message").textContent = "";
+    $("message").className = "message";
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  function validateFile(file, imageOnly) {
+    if (!file) return null;
+
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(file.name + " exceeds the 5 MB file limit.");
+    }
+
+    const allowed = imageOnly
+      ? ["image/jpeg", "image/png"]
+      : ["image/jpeg", "image/png", "application/pdf"];
+
+    if (!allowed.includes(file.type)) {
+      throw new Error(
+        file.name +
+        " has an unsupported format. Use JPG, PNG or PDF as appropriate."
+      );
+    }
+
+    return file;
+  }
+
+  function safeFilename(name) {
+    return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
+  }
+
+  async function uploadFile(file, folder, memberId) {
+    if (!file) return null;
+
+    const path = folder + "/" + memberId + "/" +
+      crypto.randomUUID() + "-" + safeFilename(file.name);
+
+    const { error } = await db.storage
+      .from(BUCKET)
+      .upload(path, file, {
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (error) throw error;
+
+    return path;
+  }
+
+  async function removeUploadedFiles(paths) {
+    const valid = paths.filter(Boolean);
+
+    if (!valid.length) return;
+
+    const { error } = await db.storage
+      .from(BUCKET)
+      .remove(valid);
+
+    if (error) {
+      console.warn("Some unused uploaded files could not be removed.", error);
+    }
+  }
+
+  async function getSignedLink(path) {
+    if (!path) return null;
+
+    const { data, error } = await db.storage
+      .from(BUCKET)
+      .createSignedUrl(path, 300);
+
+    if (error) {
+      console.warn("Unable to create private document link.", error);
+      return null;
+    }
+
+    return data.signedUrl;
+  }
+
+  async function requireAdmin() {
+    if (!window.unitySupabase) {
+      throw new Error(
+        "Supabase was not initialized. Check that supabase.js loads window.unitySupabase."
+      );
+    }
+
+    db = window.unitySupabase;
+
+    const { data, error } = await db.auth.getSession();
+
+    if (error) throw error;
+
+    if (!data.session) {
+      location.href = "login.html";
+      return false;
+    }
+
+    currentUser = data.session.user;
+
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .select("id, full_name, role")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (profileError) throw profileError;
+
+    if (profile.role !== "admin") {
+      document.querySelector("main").innerHTML =
+        '<div class="panel"><h2>Access denied</h2>' +
+        '<p>This page is restricted to cooperative administrators.</p>' +
+        '<p><a href="member.html">Go to Member Area</a></p></div>';
+
+      return false;
+    }
+
+    return true;
+  }
+
+  /*
+   * Load the member list first.
+   * If profile names cannot be loaded, retain the members and
+   * display their membership numbers rather than leaving the dropdown
+   * stuck on "Loading members…".
+   */
+  async function loadMembers() {
+  const select = $("member");
+
+  select.innerHTML =
+    '<option value="">Loading members…</option>';
+
+  members = [];
+  profileNames = {};
+
+  try {
+    // Stop waiting if Supabase does not respond within 12 seconds.
+    const result = await Promise.race([
+      db
+        .from("members")
+        .select("id, member_number, phone, status, user_id")
+        .order("member_number"),
+
+      new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(
+              "The member request timed out after 12 seconds. Check your internet connection and Supabase configuration."
+            )
+          );
+        }, 12000);
+      })
+    ]);
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    members = result.data || [];
+
+    if (members.length === 0) {
+      select.innerHTML =
+        '<option value="">No cooperative members found</option>';
+      return;
+    }
+
+    // Load names separately. If this query fails, membership
+    // numbers will still be available in the borrower dropdown.
+    const userIds = [
+      ...new Set(
+        members.map(member => member.user_id).filter(Boolean)
+      )
+    ];
+
+    let nameWarning = "";
+
+    if (userIds.length > 0) {
+      try {
+        const profileResult = await Promise.race([
+          db
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", userIds),
+
+          new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(
+                new Error("The profile request timed out.")
+              );
+            }, 12000);
+          })
+        ]);
+
+        if (profileResult.error) {
+          throw new Error(profileResult.error.message);
+        }
+
+        for (const profile of profileResult.data || []) {
+          profileNames[profile.id] = profile.full_name;
+        }
+      } catch (error) {
+        console.warn("Unable to load member names:", error);
+
+        nameWarning =
+          "Member names could not be loaded. Membership numbers are shown instead.";
+      }
+    }
+
+    // Populate the dropdown even when profile names are unavailable.
+    select.innerHTML =
+      '<option value="">Choose a borrower</option>';
+
+    for (const member of members) {
+      const option = document.createElement("option");
+
+      option.value = member.id;
+
+      const name =
+        profileNames[member.user_id] || "Member";
+
+      option.textContent =
+        name +
+        " — Member " + member.member_number +
+        (member.phone ? " — " + member.phone : "") +
+        (member.status !== "active"
+          ? " (" + member.status + ")"
+          : "");
+
+      select.appendChild(option);
+    }
+
+    if (nameWarning) {
+      showMessage(nameWarning, "error");
+    }
+
+  } catch (error) {
+    console.error("Member loading failed:", error);
+
+    members = [];
+    profileNames = {};
+
+    select.innerHTML =
+      '<option value="">Unable to load members</option>';
+
+    throw new Error(
+      "Could not load the borrower list: " +
+      (error.message || "Unknown error")
+    );
+  }
+  }
+    const select = $("member");
+
+    select.innerHTML = '<option value="">Loading members…</option>';
+
+    const { data, error } = await db
+      .from("members")
+      .select("id, member_number, phone, status, user_id")
+      .order("member_number");
+
+    if (error) {
+      members = [];
+
+      select.innerHTML =
+        '<option value="">Unable to load members</option>';
+
+      throw new Error(
+        "Could not load the member list: " + error.message
+      );
+    }
+
+    members = data || [];
+    profileNames = {};
+
+    const userIds = [...new Set(
+      members.map(m => m.user_id).filter(Boolean)
+    )];
+
+    let nameWarning = "";
+
+    if (userIds.length) {
+      const { data: profiles, error: nameError } = await db
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      if (nameError) {
+        nameWarning =
+          " Member names could not be loaded; membership numbers will be shown.";
+        console.warn("Could not load profile names:", nameError);
+      } else {
+        for (const p of profiles || []) {
+          profileNames[p.id] = p.full_name;
+        }
+      }
+    }
+
+    select.innerHTML =
+      '<option value="">Choose a borrower</option>';
+
+    for (const m of members) {
+      const name = profileNames[m.user_id] || "Member";
+
+      const option = document.createElement("option");
+      option.value = m.id;
+
+      option.textContent =
+        name + " — Member " + m.member_number +
+        (m.phone ? " — " + m.phone : "") +
+        (m.status !== "active" ? " (" + m.status + ")" : "");
+
+      select.appendChild(option);
+    }
+
+    if (members.length === 0) {
+      select.innerHTML =
+        '<option value="">No cooperative members found</option>';
+    }
+
+    if (nameWarning) {
+      showMessage(nameWarning.trim(), "error");
+    }
+  }
+
+  function memberName(memberId) {
+    const member = members.find(m => m.id === memberId);
+
+    if (!member) return "Member " + memberNumber(memberId);
+
+    return profileNames[member.user_id] || "Member";
+  }
+
+  function memberNumber(memberId) {
+    const member = members.find(m => m.id === memberId);
+
+    return member ? member.member_number : "Unknown";
+  }
+
+  async function loadLoans() {
+    const [loanResult, repaymentResult] = await Promise.all([
+      db.from("loans")
+        .select(
+          "id, member_id, principal_amount, total_repayment, amount_paid, loan_date, due_date, status, notes, recorded_by, created_at, member_photo_path, loan_form_1_path, loan_form_2_path, loan_form_3_path"
+        )
+        .order("created_at", { ascending: false }),
+
+      db.from("loan_repayments")
+        .select(
+          "id, loan_id, amount, payment_date, notes, recorded_by, created_at"
+        )
+        .order("payment_date", { ascending: false })
+    ]);
+
+    if (loanResult.error) throw loanResult.error;
+    if (repaymentResult.error) throw repaymentResult.error;
+
+    loans = loanResult.data || [];
+    repayments = repaymentResult.data || [];
+
+    renderStats();
+    await renderLoans();
+  }
+
+  function repaymentsFor(loanId) {
+    return repayments.filter(r => r.loan_id === loanId);
+  }
+
+  function totalRepaid(loan) {
+    const rows = repaymentsFor(loan.id);
+
+    const sum = rows.reduce(
+      (total, r) => total + Number(r.amount || 0),
+      0
+    );
+
+    /*
+     * Compatibility with older records that have amount_paid
+     * but no individual repayment records.
+     */
+    return rows.length ? sum : Number(loan.amount_paid || 0);
+  }
+
+  function loanOutstanding(loan) {
+    return Math.max(
+      0,
+      Number(loan.total_repayment || 0) - totalRepaid(loan)
+    );
+  }
+
+  function statusFor(loan) {
+    const outstanding = loanOutstanding(loan);
+
+    if (outstanding <= 0) return "Paid";
+
+    if (loan.due_date && loan.due_date < today()) {
+      return "Overdue";
+    }
+
+    if (totalRepaid(loan) > 0) return "Repaying";
+
+    return "Outstanding";
+  }
+
+  function renderStats() {
+    $("stat-count").textContent = loans.length;
+
+    $("stat-principal").textContent = naira(
+      loans.reduce(
+        (sum, loan) =>
+          sum + Number(loan.principal_amount || 0),
+        0
+      )
+    );
+
+    $("stat-paid").textContent = naira(
+      loans.reduce(
+        (sum, loan) => sum + totalRepaid(loan),
+        0
+      )
+    );
+
+    $("stat-outstanding").textContent = naira(
+      loans.reduce(
+        (sum, loan) => sum + loanOutstanding(loan),
+        0
+      )
+    );
+  }
+
+  async function renderDocuments(loan) {
+    const docs = [
+      ["Borrower's photograph", loan.member_photo_path],
+      ["Loan Form 1", loan.loan_form_1_path],
+      ["Loan Form 2", loan.loan_form_2_path],
+      ["Loan Form 3", loan.loan_form_3_path]
+    ];
+
+    const links = [];
+
+    for (const [label, path] of docs) {
+      if (!path) continue;
+
+      const url = await getSignedLink(path);
+
+      if (url) {
+        links.push(
+          '<a href="' + escapeHTML(url) +
+          '" target="_blank" rel="noopener">' +
+          escapeHTML(label) + '</a>'
+        );
+      } else {
+        links.push(
+          '<span class="small">' +
+          escapeHTML(label) +
+          ': link unavailable</span>'
+        );
+      }
+    }
+
+    return links.join(" ");
+  }
+
+  function renderRepaymentRows(loan) {
+    const rows = repaymentsFor(loan.id);
+
+    if (!rows.length) {
+      if (Number(loan.amount_paid || 0) > 0) {
+        return '<p class="small">This loan has a previously recorded amount paid, ' +
+          'but no individual repayment history was returned.</p>';
+      }
+
+      return '<p class="small">No repayments recorded yet.</p>';
+    }
+
+    return rows.map(r =>
+      '<div class="repayment-row">' +
+        '<span>' +
+          escapeHTML(r.payment_date || "Date not set") +
+          '<br><span class="small">' +
+            escapeHTML(r.notes || "Repayment") +
+          '</span>' +
+        '</span>' +
+        '<strong>' + escapeHTML(naira(r.amount)) + '</strong>' +
+      '</div>'
+    ).join("");
+  }
+
+  async function renderLoanCard(loan) {
+    const originalAmount = Number(loan.principal_amount || 0);
+    const agreed = Number(loan.total_repayment || 0);
+    const paid = totalRepaid(loan);
+    const outstanding = loanOutstanding(loan);
+
+    const percentagePaid = agreed > 0
+      ? Math.min(100, Math.max(0, paid / agreed * 100))
+      : 0;
+
+    const percentageLeft = Math.max(0, 100 - percentagePaid);
+    const status = statusFor(loan);
+
+    const card = document.createElement("article");
+    card.className = "loan-card";
+
+    card.innerHTML =
+      '<div class="loan-top">' +
+        '<div>' +
+          '<h3>' + escapeHTML(memberName(loan.member_id)) + '</h3>' +
+          '<p>Member number: ' +
+            escapeHTML(memberNumber(loan.member_id)) + '</p>' +
+          '<p>Loan ID: ' + escapeHTML(loan.id) + '</p>' +
+          '<p>Loan date: ' +
+            escapeHTML(loan.loan_date || "—") +
+            ' · Due: ' + escapeHTML(loan.due_date || "—") +
+          '</p>' +
+        '</div>' +
+
+        '<span class="badge ' +
+          (status === "Paid" ? "paid" :
+           status === "Overdue" ? "overdue" : "") +
+        '">' + escapeHTML(status) + '</span>' +
+      '</div>' +
+
+      '<div class="loan-numbers">' +
+        '<div><span>Original Loan Amount</span><strong>' +
+          escapeHTML(naira(originalAmount)) + '</strong></div>' +
+
+        '<div><span>Agreed Total Repayment</span><strong>' +
+          escapeHTML(naira(agreed)) + '</strong></div>' +
+
+        '<div><span>Total Repaid</span><strong>' +
+          escapeHTML(naira(paid)) + '</strong></div>' +
+
+        '<div><span>Outstanding Balance</span><strong>' +
+          escapeHTML(naira(outstanding)) + '</strong></div>' +
+      '</div>' +
+
+      '<div class="progress-label">' +
+        '<span>Amount Repaid</span><strong>' +
+          percentagePaid.toFixed(1) + '%</strong>' +
+      '</div>' +
+
+      '<div class="progress progress-paid" role="progressbar" ' +
+        'aria-label="Percentage of agreed repayment paid" ' +
+        'aria-valuemin="0" aria-valuemax="100" ' +
+        'aria-valuenow="' + percentagePaid.toFixed(1) + '">' +
+        '<div style="width:' + percentagePaid + '%"></div>' +
+      '</div>' +
+
+      '<div class="progress-label">' +
+        '<span>Remaining Balance</span><strong>' +
+          percentageLeft.toFixed(1) + '%</strong>' +
+      '</div>' +
+
+      '<div class="progress progress-remaining" role="progressbar" ' +
+        'aria-label="Percentage of agreed repayment remaining" ' +
+        'aria-valuemin="0" aria-valuemax="100" ' +
+        'aria-valuenow="' + percentageLeft.toFixed(1) + '">' +
+        '<div style="width:' + percentageLeft + '%"></div>' +
+      '</div>' +
+
+      '<div class="document-links">' +
+        '<strong>Loan Documents</strong><br>' +
+        '<span class="small">Loading private document links…</span>' +
+      '</div>' +
+
+      '<div class="repayments">' +
+        '<details>' +
+          '<summary>Repayment History (' +
+            repaymentsFor(loan.id).length + ')</summary>' +
+          '<div class="repayment-history">' +
+            renderRepaymentRows(loan) +
+          '</div>' +
+        '</details>' +
+      '</div>' +
+
+      '<div class="actions">' +
+        '<button type="button" class="primary repayment-button">' +
+          'Record Repayment</button>' +
+        '<button type="button" class="secondary print-button">' +
+          'Print Loan Summary</button>' +
+      '</div>' +
+
+      '<form class="repayment-form" hidden>' +
+        '<hr><h3>Record Repayment</h3>' +
+        '<p class="small">Outstanding: ' +
+          escapeHTML(naira(outstanding)) + '</p>' +
+
+        '<div class="form-grid">' +
+          '<div class="field">' +
+            '<label>Payment Amount (₦) *</label>' +
+            '<input name="amount" type="number" min="0.01" ' +
+              'step="0.01" required>' +
+          '</div>' +
+
+          '<div class="field">' +
+            '<label>Payment Date *</label>' +
+            '<input name="date" type="date" value="' +
+              today() + '" required>' +
+          '</div>' +
+
+          '<div class="field full">' +
+            '<label>Payment Notes</label>' +
+            '<textarea name="notes" ' +
+              'placeholder="Optional notes or reference"></textarea>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="actions">' +
+          '<button type="submit" class="primary">Save Repayment</button>' +
+          '<button type="button" class="secondary cancel-repayment">' +
+            'Cancel</button>' +
+        '</div>' +
+      '</form>' +
+
+      (loan.notes
+        ? '<div class="document-links"><strong>Loan Notes</strong><p>' +
+            escapeHTML(loan.notes) + '</p></div>'
+        : '');
+
+    const links = await renderDocuments(loan);
+
+    card.querySelector(".document-links").innerHTML =
+      '<strong>Loan Documents</strong><br>' +
+      (links || '<span class="small">No documents available.</span>');
+
+    card.querySelector(".repayment-button").addEventListener("click", () => {
+      const form = card.querySelector(".repayment-form");
+      form.hidden = !form.hidden;
+    });
+
+    card.querySelector(".cancel-repayment").addEventListener("click", () => {
+      card.querySelector(".repayment-form").hidden = true;
+    });
+
+    card.querySelector(".print-button").addEventListener("click", () => {
+      const printWindow = window.open("", "_blank");
+
+      if (!printWindow) {
+        showMessage("Allow pop-ups to print this summary.", "error");
+        return;
+      }
+
+      printWindow.document.write(
+        '<!DOCTYPE html><html><head>' +
+        '<title>Loan Summary</title><meta charset="utf-8">' +
+        '<style>body{font-family:Arial;padding:25px}' +
+        'p{margin:10px 0}h1{font-size:22px}</style>' +
+        '</head><body>' +
+
+        '<h1>Unity Cooperative — Loan Summary</h1>' +
+
+        '<p><b>Borrower:</b> ' +
+          escapeHTML(memberName(loan.member_id)) + '</p>' +
+
+        '<p><b>Membership number:</b> ' +
+          escapeHTML(memberNumber(loan.member_id)) + '</p>' +
+
+        '<p><b>Loan ID:</b> ' + escapeHTML(loan.id) + '</p>' +
+
+        '<p><b>Loan date:</b> ' +
+          escapeHTML(loan.loan_date || "—") + '</p>' +
+
+        '<p><b>Due date:</b> ' +
+          escapeHTML(loan.due_date || "—") + '</p>' +
+
+        '<p><b>Original Loan Amount:</b> ' +
+          escapeHTML(naira(originalAmount)) + '</p>' +
+
+        '<p><b>Agreed total repayment:</b> ' +
+          escapeHTML(naira(agreed)) + '</p>' +
+
+        '<p><b>Repaid:</b> ' +
+          escapeHTML(naira(paid)) + '</p>' +
+
+        '<p><b>Outstanding balance:</b> ' +
+          escapeHTML(naira(outstanding)) + '</p>' +
+
+        '<p><b>Status:</b> ' + escapeHTML(status) + '</p>' +
+
+        '<p><b>Progress:</b> ' +
+          percentagePaid.toFixed(1) + '% repaid; ' +
+          percentageLeft.toFixed(1) + '% remaining</p>' +
+
+        '<p><b>Notes:</b> ' +
+          escapeHTML(loan.notes || "—") + '</p>' +
+
+        '<hr><h2>Repayment History</h2>' +
+        '<div>' + renderRepaymentRows(loan) + '</div>' +
+
+        '<script>window.onload=function(){window.print()}<\/script>' +
+        '</body></html>'
+      );
+
+      printWindow.document.close();
+    });
+
+    card.querySelector(".repayment-form").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const button = form.querySelector('button[type="submit"]');
+
+      if (busy) return;
+
+      const formData = new FormData(form);
+      const amount = Number(formData.get("amount"));
+      const paymentDate = String(formData.get("date") || "");
+      const notes = String(formData.get("notes") || "").trim();
+
+      const latestOutstanding = loanOutstanding(loan);
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showMessage("Enter a valid repayment amount.", "error");
+        return;
+      }
+
+      if (amount > latestOutstanding + 0.000001) {
+        showMessage(
+          "This payment exceeds the outstanding balance of " +
+          naira(latestOutstanding) + ".",
+          "error"
+        );
+        return;
+      }
+
+      if (!paymentDate) {
+        showMessage("Choose the payment date.", "error");
+        return;
+      }
+
+      if (!confirm(
+        "Record " + naira(amount) + " against this loan for " +
+        memberName(loan.member_id) + "?"
+      )) return;
+
+      busy = true;
+      button.disabled = true;
+      button.textContent = "Saving…";
+
+      try {
+        const { data: latestRows, error: readError } = await db
+          .from("loan_repayments")
+          .select("amount")
+          .eq("loan_id", loan.id);
+
+        if (readError) throw readError;
+
+        const actualPaid = (latestRows || []).reduce(
+          (sum, row) => sum + Number(row.amount || 0),
+          0
+        );
+
+        const actualOutstanding = Math.max(
+          0,
+          Number(loan.total_repayment || 0) - actualPaid
+        );
+
+        if (amount > actualOutstanding + 0.000001) {
+          throw new Error(
+            "The outstanding balance has changed. Refresh the records and try again."
+          );
+        }
+
+        const { error: insertError } = await db
+          .from("loan_repayments")
+          .insert({
+            loan_id: loan.id,
+            amount: amount,
+            payment_date: paymentDate,
+            notes: notes || null,
+            recorded_by: currentUser.id
+          });
+
+        if (insertError) throw insertError;
+
+        const newPaid = actualPaid + amount;
+
+        const { error: updateError } = await db
+          .from("loans")
+          .update({
+            amount_paid: newPaid,
+            status: newPaid >= Number(loan.total_repayment || 0)
+              ? "paid"
+              : "outstanding"
+          })
+          .eq("id", loan.id);
+
+        if (updateError) {
+          showMessage(
+            "The repayment row was saved, but updating the loan summary failed. " +
+            "Refresh the page and check the repayment history before trying again. " +
+            updateError.message,
+            "error"
+          );
+        } else {
+          showMessage("Repayment saved successfully.", "success");
+        }
+
+        await loadLoans();
+
+      } catch (error) {
+        showMessage(
+          error.message || "Unable to save the repayment.",
+          "error"
+        );
+      } finally {
+        busy = false;
+        button.disabled = false;
+        button.textContent = "Save Repayment";
+      }
+    });
+
+    return card;
+  }
+
+  async function renderLoans() {
+    const list = $("loan-list");
+    const term = $("search").value.trim().toLowerCase();
+
+    const filtered = loans.filter(loan => {
+      const text = [
+        memberName(loan.member_id),
+        memberNumber(loan.member_id),
+        loan.id,
+        loan.status
+      ].join(" ").toLowerCase();
+
+      return text.includes(term);
+    });
+
+    list.innerHTML = "";
+
+    if (!filtered.length) {
+      list.innerHTML =
+        '<div class="empty">' +
+        (loans.length
+          ? "No loans match your search."
+          : "No loan records found. Register a loan above to begin.") +
+        '</div>';
+
+      return;
+    }
+
+    for (const loan of filtered) {
+      try {
+        const card = await renderLoanCard(loan);
+        list.appendChild(card);
+      } catch (error) {
+        console.error("Unable to render loan card:", error);
+
+        const errorCard = document.createElement("div");
+        errorCard.className = "empty";
+        errorCard.textContent =
+          "A loan record could not be displayed. Try refreshing the records.";
+
+        list.appendChild(errorCard);
+      }
+    }
+  }
+
+  $("loan-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    clearMessage();
+
+    if (busy) return;
+
+    const button = $("save-loan");
+    const memberId = $("member").value;
+    const originalAmount = Number($("principal").value);
+    const totalRepayment = Number($("total-repayment").value);
+    const loanDate = $("loan-date").value;
+    const dueDate = $("due-date").value;
+    const notes = $("loan-notes").value.trim();
+
+    const photo = $("photo").files[0];
+    const form1 = $("form1").files[0];
+    const form2 = $("form2").files[0];
+    const form3 = $("form3").files[0];
+
+    try {
+      if (!memberId) {
+        throw new Error("Choose the borrower.");
+      }
+
+      if (!Number.isFinite(originalAmount) || originalAmount <= 0) {
+        throw new Error("Enter a valid original loan amount.");
+      }
+
+      if (!Number.isFinite(totalRepayment) || totalRepayment <= 0) {
+        throw new Error("Enter a valid total repayment amount.");
+      }
+
+      if (totalRepayment < originalAmount) {
+        throw new Error(
+          "The agreed total repayment cannot be less than the original loan amount."
+        );
+      }
+
+      if (!loanDate || !dueDate) {
+        throw new Error("Enter both the loan date and due date.");
+      }
+
+      if (dueDate < loanDate) {
+        throw new Error("The due date cannot be earlier than the loan date.");
+      }
+
+      if (!photo) {
+        throw new Error("The borrower's photograph is required.");
+      }
+
+      if (!form1) {
+        throw new Error("Loan Form 1 is required.");
+      }
+
+      validateFile(photo, true);
+      validateFile(form1, false);
+      validateFile(form2, false);
+      validateFile(form3, false);
+
+    } catch (error) {
+      showMessage(error.message, "error");
+      return;
+    }
+
+    if (!confirm(
+      "Register this loan for " + memberName(memberId) +
+      " with an original loan amount of " + naira(originalAmount) +
+      " and total repayment of " + naira(totalRepayment) + "?"
+    )) return;
+
+    busy = true;
+    button.disabled = true;
+    button.textContent = "Saving Loan…";
+
+    const uploaded = [];
+    let insertedLoanId = null;
+
+    try {
+      const photoPath = await uploadFile(
+        photo, "loans/photos", memberId
+      );
+
+      uploaded.push(photoPath);
+
+      const form1Path = await uploadFile(
+        form1, "loans/forms", memberId
+      );
+
+      uploaded.push(form1Path);
+
+      const form2Path = form2
+        ? await uploadFile(form2, "loans/forms", memberId)
+        : null;
+
+      if (form2Path) uploaded.push(form2Path);
+
+      const form3Path = form3
+        ? await uploadFile(form3, "loans/forms", memberId)
+        : null;
+
+      if (form3Path) uploaded.push(form3Path);
+
+      /*
+       * Keep principal_amount as the database column name.
+       * Only the wording displayed on the website has changed.
+       */
+      const { data, error } = await db
+        .from("loans")
+        .insert({
+          member_id: memberId,
+          principal_amount: originalAmount,
+          total_repayment: totalRepayment,
+          amount_paid: 0,
+          loan_date: loanDate,
+          due_date: dueDate,
+          status: "outstanding",
+          notes: notes || null,
+          recorded_by: currentUser.id,
+          member_photo_path: photoPath,
+          loan_form_1_path: form1Path,
+          loan_form_2_path: form2Path,
+          loan_form_3_path: form3Path
+        })
+        .select("id")
+        .single();
+
+      if (error) throw error;
+
+      insertedLoanId = data.id;
+
+      showMessage(
+        "Loan record created successfully. Loan ID: " + insertedLoanId,
+        "success"
+      );
+
+      $("loan-form").reset();
+      $("loan-date").value = today();
+      $("due-date").value = today();
+
+      await loadLoans();
+
+    } catch (error) {
+      if (!insertedLoanId) {
+        await removeUploadedFiles(uploaded);
+      }
+
+      showMessage(
+        "Unable to complete the loan registration. " +
+        (error.message || "Unknown error") +
+        (uploaded.length
+          ? " Uploaded files were cleaned up where permissions allowed."
+          : ""),
+        "error"
+      );
+
+    } finally {
+      busy = false;
+      button.disabled = false;
+      button.textContent = "Save Loan Record";
+    }
+  });
+
+  $("refresh").addEventListener("click", async () => {
+    const button = $("refresh");
+
+    try {
+      clearMessage();
+      button.disabled = true;
+      button.textContent = "Refreshing…";
+
+      let memberError = null;
+
+      try {
+        await loadMembers();
+      } catch (error) {
+        memberError = error;
+      }
+
+      /*
+       * Attempt to load loan records even when loading members fails.
+       */
+      await loadLoans();
+
+      if (memberError) {
+        showMessage(
+          "Loan records loaded, but the borrower list could not be loaded. " +
+          memberError.message,
+          "error"
+        );
+      } else {
+        showMessage("Loan records refreshed.", "success");
+      }
+
+    } catch (error) {
+      showMessage(
+        "Unable to refresh loan records: " +
+        (error.message || "Unknown error"),
+        "error"
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Refresh Records";
+    }
+  });
+
+  $("search").addEventListener("input", () => {
+    renderLoans().catch(error => {
+      showMessage(
+        error.message || "Unable to display loans.",
+        "error"
+      );
+    });
+  });
+
+  $("loan-date").value = today();
+  $("due-date").value = today();
+
+  async function start() {
+    /*
+     * Set useful initial values before contacting Supabase.
+     */
+    renderStats();
+
+    try {
+      const allowed = await requireAdmin();
+
+      if (!allowed) return;
+
+    } catch (error) {
+      showMessage(
+        "Unable to verify administrator access: " +
+        (error.message || "Unknown error"),
+        "error"
+      );
+
+      return;
+    }
+
+    let memberError = null;
+    let loanError = null;
+
+    /*
+     * Attempt each load independently so one failure does not
+     * automatically prevent the other section from loading.
+     */
+    try {
+      await loadMembers();
+    } catch (error) {
+      memberError = error;
+      console.error("Member list loading failed:", error);
+    }
+
+    try {
+      await loadLoans();
+    } catch (error) {
+      loanError = error;
+      console.error("Loan record loading failed:", error);
+    }
+
+    if (loanError) {
+      showMessage(
+        "Unable to load loan records: " +
+        (loanError.message || "Unknown error"),
+        "error"
+      );
+
+      $("loan-list").innerHTML =
+        '<div class="empty">' +
+        'Loan records could not be loaded. Check your database permissions ' +
+        'and internet connection, then tap Refresh Records.' +
+        '</div>';
+
+      return;
+    }
+
+    if (memberError) {
+      showMessage(
+        "Loan records loaded, but the borrower dropdown could not be loaded. " +
+        memberError.message,
+        "error"
+      );
+    }
+  }
+
+  start();
+})();
+</script>
+
+</body>
+</html>
